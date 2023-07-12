@@ -1,0 +1,40 @@
+{
+    "name": "utecca/number",
+    "description": "A package for working with arbitrary precision numbers in Laravel.",
+    "keywords": [
+        "laravel",
+        "number",
+        "arbitrary",
+        "precision",
+        "bcmath"
+    ],
+    "type": "library",
+    "homepage": "https://github.com/utecca/number",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Utecca\\Number\\": "src/",
+            "Utecca\\Number\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Albert Haff",
+            "email": "albert@utecca.com"
+        }
+    ],
+    "require": {
+        "ext-bcmath": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.5",
+        "pestphp/pest": "^1.23",
+        "pestphp/pest-plugin-laravel": "^1.4",
+        "pestphp/pest-plugin-parallel": "^1.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
