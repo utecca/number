@@ -233,6 +233,14 @@ readonly class Number
         return $this->value;
     }
 
+    /**
+     * Convert the number to a monetary amount, ie. a number with two decimals.
+     */
+    public function toMonetaryAmount(): string
+    {
+        return bcadd($this->value, '0', 2);
+    }
+
     public function inCents(): int
     {
         if ($this->decimals > 2) {
