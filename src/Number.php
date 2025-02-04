@@ -234,6 +234,16 @@ readonly class Number
     }
 
     /**
+     * This method is only here for backwards compatibility with the Amount class.
+     *
+     * @deprecated Copy is not needed for immutable objects.
+     */
+    public function copy(): self
+    {
+        return $this;
+    }
+
+    /**
      * Convert the number to a monetary amount, ie. a number with two decimals.
      */
     public function toMonetaryAmount(): string
