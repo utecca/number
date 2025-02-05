@@ -21,7 +21,7 @@ readonly class NumberFromDecimal implements CastsAttributes
     /**
      * @param  float|string  $value
      */
-    public function get($model, string $key, $value, array $attributes)
+    public function get($model, string $key, $value, array $attributes): Number|null
     {
         if ($value == null) {
             return null;
