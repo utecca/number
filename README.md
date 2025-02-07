@@ -35,7 +35,8 @@ protected $casts = [
 ];
 ```
 
-## Operations
+## Basic operations
+All operations will return the result as a new Number.
 
 When doing operations, you always have the option to specify the number of decimals to use.
 
@@ -70,10 +71,27 @@ $number->ceil();
 $number->abs();
 ```
 
+## Special operations
+When doing operations, you always have the option to specify the number of decimals to use.
+
+If not specified, the max number of decimals will be taken from the first operand's max.
+
+All operations will return the result as a new Number.
+```php
+// Extracts and returns the absolute decimal part of the number, eg. 123.45 wil return 0.45
+Number::of('123.45')->decimalFraction(); // Returns 0.45
+
+// Conditional negation
+Number::of('123.45')->negate(); // Returns -123.45
+Number::of('123.45')->negate(false); // Returns 123.45
+
+// Exchange rate conversion
+Number::of('123.45')->exchangeWithRate(745.5); // Returns 920,31
+```
+
 ## Other methods
 
 ```php
-
 // Various getters
 $number->isZero();
 $number->isPositive();
