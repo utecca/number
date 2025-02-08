@@ -26,7 +26,7 @@ readonly class Number
     /**
      * If the decimals are not defined, the number of decimals will be counted and limited.
      */
-    public static function of(Number|string|float|int $value, int|null $decimals = null): self
+    public static function of(Number|string|float|int $value = 0, int|null $decimals = null): self
     {
         if ($decimals === null) {
             $decimals = self::countDecimals($value);
@@ -111,9 +111,13 @@ readonly class Number
     /**
      * Add or remove the sign of the number.
      */
-    public function negate(): self
+    public function negate(bool $when = true): self
     {
-        return $this->mul(-1);
+        if ($when) {
+            return $this->mul(-1);
+        }
+
+        return $this;
     }
 
     /**
@@ -126,7 +130,7 @@ readonly class Number
 
     /**
      * Round the number.
-     */ 
+     */
     public function round(int $decimals = 0): self
     {
         return new self(BCMath::round($this->value, $decimals));
@@ -239,16 +243,6 @@ readonly class Number
     }
 
     /**
-     * This method is only here for backwards compatibility with the Amount class.
-     *
-     * @deprecated Copy is not needed for immutable objects.
-     */
-    public function copy(): self
-    {
-        return $this;
-    }
-
-    /**
      * Convert the number to a monetary amount, ie. a number with two decimals.
      */
     public function toMonetaryAmount(): string
@@ -266,6 +260,41 @@ readonly class Number
         $value = bcadd($this->value, '0', 2);
 
         return (int) str_replace('.', '', $value);
+    }
+
+    public function format(int $decimals, bool $europeanStyle = true): string
+    {
+        if ($europeanStyle) {
+            return number_format($this->toFloat(), $decimals, ',', '.');
+        }
+        
+        return number_format($this->toFloat(), $decimals);
+    }
+
+    /**
+     * Get the decimal fraction of the number, eg. 0.25 for 1.25 or -0.5 for -2.5.
+     */
+    public function decimalFraction(): Number
+    {
+        // Get decimals
+        $decimalPosition = strrpos($this->value, '.');
+
+        $value = $decimalPosition === false
+            ? '0'
+            : substr($this->value, $decimalPosition + 1);
+
+        // Create new value only with decimals
+        $value = "0.{$value}";
+
+        return Number::of($value)->negate(when: $this->isNegative());
+    }
+
+    /**
+     * Exchange the number with an exchange rate, eg. 1000 with exchangeRate 745 will return 7450
+     */
+    public function exchangeWithRate(Number|string|float|int $exchangeRate, int|null $decimals = null): Number
+    {
+        return $this->mul($exchangeRate)->div(100, $decimals);
     }
 
     private function sanitize(string $value): string
@@ -287,19 +316,14 @@ readonly class Number
 
     private static function countDecimals(Number|string|float|int $value): int
     {
-        if ($value instanceof Number) {
-            return $value->decimals;
-        }
+        $decimals = match (true) {
+            $value instanceof Number => $value->decimals,
+            is_string($value) => strlen(substr($value, strpos($value, ".") + 1)),
+            is_float($value) => strlen(substr((string) $value, strpos((string) $value, ".") + 1)),
+            default => 0,
+        };
 
-        if (is_string($value)) {
-            return strlen(substr($value, strpos($value, ".") + 1));
-        }
-
-        if (is_float($value)) {
-            $value = (string) $value;
-            return strlen(substr($value, strpos($value, ".") + 1));
-        }
-
-        return 0;
+        // Return at least 2 decimals
+        return max([2, $decimals]);
     }
 }

@@ -273,3 +273,31 @@ it('can ceil numbers correctly', function () {
 it('can floor numbers correctly', function () {
     $this->assertTrue(Number::of(1.005)->floor()->eq(1));
 });
+
+it('can return decimal fraction', function (float $value, float $result) {
+    $number = Number::of($value)->decimalFraction();
+    $decimals = $number->decimalFraction();
+
+    $this->assertTrue($decimals->eq($result));
+})->with([
+    [1.005, 0.005],
+    [-1.005, -0.005],
+]);
+
+it('sets number of decimals correctly', function (int|float $value, int|float $quantity) {
+    $number = Number::of($value);
+    $this->assertTrue($number->decimals === $quantity);
+})
+->with([
+    ['value' => 1, 'quantity' => 2], // It should default to two decimals, if there are fewer than two
+    ['value' => 1.1, 'quantity' => 2], // It should default to two decimals, if there are fewer than two
+    ['value' => 1.005, 'quantity' => 3],
+    ['value' => 1.0000000005, 'quantity' => 10],
+]);
+
+it('can format number correctly', function (float $value, string $result, bool $europeanStyle) {
+    $this->assertEquals($result, Number::of($value)->format(2, $europeanStyle));
+})->with([
+    'american style' => [1_234_567.89, '1,234,567.89', false],
+    'european style' => [1_234_567.89, '1.234.567,89', true],
+]);
