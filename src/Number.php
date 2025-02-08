@@ -156,11 +156,6 @@ readonly class Number
         return Number::of($this->value, 25)->div(100)->mul($value, $decimals ?? $this->decimals);
     }
 
-    public function exchangeWithRate(Number $exchangeRate): Number
-    {
-        return $this->mul($exchangeRate)->div(100);
-    }
-
     public function isZero(): bool
     {
         return 0 == (float) $this->value;
