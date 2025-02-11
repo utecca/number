@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Collection;
 use Pest\Expectation;
 use Utecca\Number\Number;
 
@@ -300,4 +301,61 @@ it('can format number correctly', function (float $value, string $result, bool $
 })->with([
     'american style' => [1_234_567.89, '1,234,567.89', false],
     'european style' => [1_234_567.89, '1.234.567,89', true],
+]);
+
+it('can instantiate a Number from cents', function (float $expected, int $cents) {
+    $this->assertEquals($expected, Number::fromCents($cents)->toFloat());
+})->with([
+    [1.00, 100],
+    [10.01, 1001],
+    [0.00, 0],
+    [0.01, 1],
+    [0.10, 10],
+    [101.10, 10110],
+    [1111111101.99, 111111110199],
+    [1.10, 110],
+    [-1.10, -110],
+    [-1111111101.99, -111111110199],
+]);
+
+it('can determine the min of numbers', function (int|float $expected, array $numbers) {
+    $numbers = array_map(fn ($number) => Number::of($number), $numbers);
+
+    // Test with array
+    $this->assertEquals(
+        expected: $expected,
+        actual: Number::min($numbers)->toFloat()
+    );
+
+    // Test with collection
+    $this->assertEquals(
+        expected: $expected,
+        actual: Number::min(new Collection($numbers))->toFloat()
+    );
+})->with([
+    [1.24, [2.1, 1.24]],
+    [1, [2, 5, 1, 5]],
+    [-2, [1, -2, -1, 5]],
+    [-2, [-1, -2]],
+]);
+
+it('can determine the max of numbers', function (int|float $expected, array $numbers) {
+    $numbers = array_map(fn ($number) => Number::of($number), $numbers);
+
+    // Test with array
+    $this->assertEquals(
+        expected: $expected,
+        actual: Number::max($numbers)->toFloat()
+    );
+
+    // Test with collection
+    $this->assertEquals(
+        expected: $expected,
+        actual: Number::max(new Collection($numbers))->toFloat()
+    );
+})->with([
+    [2.1, [2.1, 1.24]],
+    [5, [2, 5, 1, 5]],
+    [5, [1, -2, -1, 5]],
+    [-1, [-1, -2]],
 ]);

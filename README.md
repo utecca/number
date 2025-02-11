@@ -21,6 +21,9 @@ Number::of('123.45');
 
 // Force a certain number of decimals
 Number::of('123.45', 1); // Will return 123.5
+
+// Init from a value in cents
+Number::fromCents(12345); // Will return 123.45
 ```
 
 ## Laravel casting
@@ -72,21 +75,33 @@ $number->abs();
 ```
 
 ## Special operations
-When doing operations, you always have the option to specify the number of decimals to use.
+When doing special operations, you sometimes have the option to specify the number of decimals to use.
 
 If not specified, the max number of decimals will be taken from the first operand's max.
 
 All operations will return the result as a new Number.
 ```php
 // Extracts and returns the absolute decimal part of the number, eg. 123.45 wil return 0.45
-Number::of('123.45')->decimalFraction(); // Returns 0.45
+Number::of(123.45)->decimalFraction(); // Returns 0.45
 
 // Conditional negation
-Number::of('123.45')->negate(); // Returns -123.45
-Number::of('123.45')->negate(false); // Returns 123.45
+Number::of(123.45)->negate(); // Returns -123.45
+Number::of(123.45)->negate(false); // Returns 123.45
 
 // Exchange rate conversion
-Number::of('123.45')->exchangeWithRate(745.5); // Returns 920,31
+Number::of(123.45)->exchangeWithRate(745.5); // Returns 920.31
+
+// Min
+Number::min([
+    Number::of(123.45),
+    Number::of(100),
+]); // Returns 100.00
+
+// Max
+Number::max([
+    Number::of(123.45),
+    Number::of(100),
+]); // Returns 123.45
 ```
 
 ## Other methods
