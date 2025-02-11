@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utecca\Number;
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 readonly class Number
@@ -50,6 +51,64 @@ readonly class Number
         }
 
         throw new InvalidArgumentException('The value must be numeric or a Number instance.');
+    }
+
+    /**
+     * Instantiate a number from a value in cents. The decimals will default to 2.
+     */
+    public static function fromCents(Number|string|int $value, int $decimals = 2): self
+    {
+        return self::of($value)->div(100, $decimals);
+    }
+
+    /**
+     * @param array<Number>|Collection<Number> $numbers
+     */
+    public static function min(array|Collection $numbers): self
+    {
+        if (count($numbers) === 0) {
+            throw new InvalidArgumentException('The array must contain at least one Number instance.');
+        }
+
+        $min = null;
+
+        /** @var Number $number */
+        foreach ($numbers as $number) {
+            if (! $number instanceof Number) {
+                throw new InvalidArgumentException('The array must contain only Number instances.');
+            }
+
+            if ($min === null || $number->lt($min)) {
+                $min = $number;
+            }
+        }
+
+        return $min;
+    }
+
+    /**
+     * @param array<Number>|Collection<Number> $numbers
+     */
+    public static function max(array|Collection $numbers): self
+    {
+        if (count($numbers) === 0) {
+            throw new InvalidArgumentException('The array must contain at least one Number instance.');
+        }
+
+        $max = null;
+
+        /** @var Number $number */
+        foreach ($numbers as $number) {
+            if (! $number instanceof Number) {
+                throw new InvalidArgumentException('The array must contain only Number instances.');
+            }
+
+            if ($max === null || $number->gt($max)) {
+                $max = $number;
+            }
+        }
+
+        return $max;
     }
 
     /**
